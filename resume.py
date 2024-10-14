@@ -26,7 +26,8 @@ def extract_information(full_text):
         education_section = education_match.group(1)  # Everything after 'Education:'
         
         # Split education entries by new lines
-        education_list = re.split(r'\n', education_section)
+        education_list = re.split(r',|\n', education_section)
+
         
         # Clean up education entries (remove empty and extra spaces)
         education_list = [edu.strip() for edu in education_list if edu.strip()]
