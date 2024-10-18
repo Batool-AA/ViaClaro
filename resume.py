@@ -149,7 +149,7 @@ file_jobs = "data/Jobs/jobs1.xlsx"
 job_dict,job_skills = process_excel(file_jobs)
 
 # Process all folders and store the results in the CSV
-resume_skills = process_all_folders(folder, output_csv)
-vocab = vocabulary(resume_skills,job_skills)
+# resume_skills = process_all_folders(folder, output_csv)
+vocab = vocabulary("",job_skills)
 print("Vocabulary: ", vocab)
 
