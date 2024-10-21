@@ -9,3 +9,19 @@ Before running the commands, make sure to install the necessary package. You can
 
 ```bash
 pip install open-ai
+
+```bash
+pip install PyPDF2
+
+```bash
+pip install pickle
+
+```bash
+pip install numpy
+
+```bash
+pip install scikit-learn
+
+```bash
+pip install pandas
+
