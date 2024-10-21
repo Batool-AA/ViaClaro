@@ -144,12 +144,6 @@ def pdf_to_string(file_path):
         for page in reader.pages:
             text += page.extract_text() + "\n"
     return text
-
-
-myresume=""
-pdf = select_pdf_file()
-if pdf:
-    myresume = pdf_to_string(pdf)
 #---------------------------Training Data-----------------------------------#
 filename = 'data/Resume.csv'
 column_name = 'Resume_str'
@@ -162,7 +156,10 @@ le,category = assigning_categories(df,'Category')
 
 
 #--------------------------------- Testing --------------------------------#
-
+myresume=""
+pdf = select_pdf_file()
+if pdf:
+    myresume = pdf_to_string(pdf)
 with open('tfidf.pkl', 'rb') as tfidf_file:
     tfidf = pickle.load(tfidf_file)
 with open('lg_clf.pkl', 'rb') as ann_file:
