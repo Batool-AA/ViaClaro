@@ -35,14 +35,19 @@ def cleanResume(txt):
     cleanText = re.sub(r'\s+', ' ', cleanText)
     return cleanText
 
-def creating_vectors(filename,column):
-    df = pd.read_csv(filename)
-    df_shuffled = shuffle(df, random_state=42)
-    df = df_shuffled
-    df[column] = df[column].apply(lambda x: cleanResume(x))
-    tfidf.fit(df[column])
-    requiredText  = tfidf.transform(df[column])
-    return df, requiredText, tfidf
+def creating_vectors(file1, file2, column1, column2):
+    df1 = pd.read_csv(file1)  # First file with Resume and Category
+    df2 = pd.read_csv(file2)  # Second file with Resume and Category
+    # Clean resumes in both datasets
+    df1[column1] = df1[column1].fillna('').apply(lambda x: cleanResume(x) if isinstance(x, str) else '')
+    df2[column1] = df2[column1].fillna('').apply(lambda x: cleanResume(x) if isinstance(x, str) else '')
+    # Concatenate the dataframes along rows, ensuring categories and resumes are included
+    df_combined = pd.concat([df1[[column1, column2]], df2[[column1, column2]]], ignore_index=True)
+    # Fit TF-IDF on the combined resume text
+    tfidf.fit(df_combined[column1])
+    requiredText = tfidf.transform(df_combined[column1])
+    return df_combined, requiredText, tfidf
+
 
 def assigning_categories(df,column):
     le = LabelEncoder()
