@@ -1,12 +1,27 @@
-from resume_2 import select_pdf_file
-from resume_2 import pdf_to_string
+from sklearn.model_selection import train_test_split
+from functions import creating_vectors
+from functions import assigning_categories
+from model import compare_models
+from functions import select_pdf_file
+from functions import pdf_to_string
 import pickle
-from resume_2 import cleanResume
+from functions import cleanResume
 import numpy as np
-from resume_2 import le
-from display_roadmap import generate_roadmap
+from functions import le
+from functions import generate_roadmap
 
+#---------------------------------- Training -------------------------------------#
+filename = 'data/Resume.csv'
+column_name = 'Resume_str'
+df,required_text, tfidf= creating_vectors(filename,column_name)
+le,category = assigning_categories(df,'Category')
 
+# X_train,X_test, y_train, y_test = train_test_split(required_text, df['Category'], test_size=0.2, random_state=42)
+
+#---------------------------------- Compare --------------------------------------#
+# compare_models(X_train, X_test, y_train, y_test)
+
+#---------------------------------- Prediction -----------------------------------#
 myresume=""
 
 pdf = select_pdf_file()
