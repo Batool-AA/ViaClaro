@@ -5,6 +5,9 @@ from sklearn.metrics import classification_report, accuracy_score
 import pickle
 import matplotlib.pyplot as plt
 import numpy as np
+from functions import creating_vectors
+from functions import assigning_categories
+from sklearn.model_selection import train_test_split
 
 
 def ann(X_train,X_test,y_train,y_test):
@@ -80,3 +83,18 @@ def compare_models(X_train, X_test, y_train, y_test):
 
     plt.savefig('model_comparison.png', bbox_inches='tight')
     plt.close()
+
+#---------------------------------- Training -------------------------------------#
+filename1 = 'data/Resume.csv'
+filename2 = 'data/UpdatedResumeDataSet.csv'
+column_name1 = 'Resume_str'  # Resume column
+column_name2 = 'Category'  
+df_combined, required_text, tfidf = creating_vectors(filename1, filename2, column_name1, column_name2)
+le, category = assigning_categories(df_combined, column_name2)
+
+
+X_train,X_test, y_train, y_test = train_test_split(required_text, df_combined['Category'], test_size=0.2, random_state=42)
+
+
+#---------------------------------- Compare --------------------------------------#
+compare_models(X_train, X_test, y_train, y_test)

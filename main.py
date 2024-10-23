@@ -1,7 +1,3 @@
-from sklearn.model_selection import train_test_split
-from functions import creating_vectors
-from functions import assigning_categories
-from model import compare_models
 from functions import select_pdf_file
 from functions import pdf_to_string
 import pickle
@@ -10,45 +6,33 @@ import numpy as np
 from functions import le
 from functions import generate_roadmap
 
-
-#---------------------------------- Training -------------------------------------#
-filename1 = 'data/Resume.csv'
-filename2 = 'data/UpdatedResumeDataSet.csv'
-column_name1 = 'Resume_str'  # Resume column
-column_name2 = 'Category'  
-df_combined, required_text, tfidf = creating_vectors(filename1, filename2, column_name1, column_name2)
-le, category = assigning_categories(df_combined, column_name2)
-
-# X_train,X_test, y_train, y_test = train_test_split(required_text, df_combined['Category'], test_size=0.2, random_state=42)
-
-
-#---------------------------------- Compare --------------------------------------#
-# compare_models(X_train, X_test, y_train, y_test)
-
 #---------------------------------- Prediction -----------------------------------#
-# myresume=""
+myresume=""
 
-# # pdf = select_pdf_file()
-# # if pdf:
-# #     myresume = pdf_to_string(pdf)
+pdf = select_pdf_file()
+if pdf:
+    myresume = pdf_to_string(pdf)
 
-# with open('tfidf.pkl', 'rb') as tfidf_file:
-#     tfidf = pickle.load(tfidf_file)
-# with open('lg_clf.pkl', 'rb') as lr_file:
-#     lg_clf = pickle.load(lr_file)
+with open('tfidf.pkl', 'rb') as tfidf_file:
+    tfidf = pickle.load(tfidf_file)
+with open('lg_clf.pkl', 'rb') as lr_file:
+    lg_clf = pickle.load(lr_file)
+with open('label_encoder.pkl', 'rb') as le_file:
+    le_loaded = pickle.load(le_file)
 
-# cleaned_resume = cleanResume(myresume)
-# input_features = tfidf.transform([cleaned_resume])
-# predicted_probabilities = lg_clf.predict_proba(input_features)
 
-# top_n = 5  
-# top_n_indices = np.argsort(predicted_probabilities[0])[-top_n:][::-1]  
-# top_categories = le.inverse_transform(top_n_indices)
-# top_probabilities = predicted_probabilities[0][top_n_indices]
+cleaned_resume = cleanResume(myresume)
+input_features = tfidf.transform([cleaned_resume])
+predicted_probabilities = lg_clf.predict_proba(input_features)
 
-# for category, probability in zip(top_categories, top_probabilities):
-#     print(f"Category: {category}, Probability: {probability:.4f}")
+top_n = 5  
+top_n_indices = np.argsort(predicted_probabilities[0])[-top_n:][::-1]  
+top_categories = le_loaded.inverse_transform(top_n_indices)
+top_probabilities = predicted_probabilities[0][top_n_indices]
 
-# index = int(input("Choose profession to view the career path: "))
-# print(top_categories[index-1])
-# print(generate_roadmap(top_categories[index-1]))
+for category, probability in zip(top_categories, top_probabilities):
+    print(f"Category: {category}, Probability: {probability:.4f}")
+
+index = int(input("Choose profession to view the career path: "))
+print(top_categories[index-1])
+print(generate_roadmap(top_categories[index-1]))

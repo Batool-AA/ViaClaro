@@ -12,7 +12,6 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.metrics import classification_report,accuracy_score
 import pickle
 from sklearn.utils import shuffle
-from display_roadmap import generate_roadmap
 import tkinter as tk
 from tkinter import filedialog
 import PyPDF2
