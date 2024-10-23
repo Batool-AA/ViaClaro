@@ -7,7 +7,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 from functions import creating_vectors
 from functions import assigning_categories
+from functions import combine_files
 from sklearn.model_selection import train_test_split
+import pandas as pd
+import seaborn as sns
 
 
 def ann(X_train,X_test,y_train,y_test):
@@ -49,7 +52,7 @@ def compare_models(X_train, X_test, y_train, y_test):
     f1_score = []
 
     for y_pred in [y_pred_ann, y_pred_nb, y_pred_lr]:
-        report = classification_report(y_test, y_pred, output_dict=True)
+        report = classification_report(y_test, y_pred, output_dict=True, zero_division=0)
         accuracy.append(accuracy_score(y_test, y_pred))
         precision.append(report['macro avg']['precision'])
         recall.append(report['macro avg']['recall'])
@@ -87,14 +90,35 @@ def compare_models(X_train, X_test, y_train, y_test):
 #---------------------------------- Training -------------------------------------#
 filename1 = 'data/Resume.csv'
 filename2 = 'data/UpdatedResumeDataSet.csv'
-column_name1 = 'Resume_str'  # Resume column
+column_name1 = 'Resume_str' 
 column_name2 = 'Category'  
-df_combined, required_text, tfidf = creating_vectors(filename1, filename2, column_name1, column_name2)
+df_combined = combine_files(filename1, filename2, column_name1, column_name2)
+required_text, tfidf = creating_vectors(df_combined, column_name1)
 le, category = assigning_categories(df_combined, column_name2)
 
 
-X_train,X_test, y_train, y_test = train_test_split(required_text, df_combined['Category'], test_size=0.2, random_state=42)
+X_train,X_test, y_train, y_test = train_test_split(required_text, df_combined['Category'], test_size=0.2, random_state=42, stratify=df_combined['Category'])
 
-
-#---------------------------------- Compare --------------------------------------#
+#---------------------------------- Training + Comparing Models --------------------------------------#
 compare_models(X_train, X_test, y_train, y_test)
+
+#------------------------ Testing and Training Plotting -----------------------------#
+train_df = pd.DataFrame({'Category': le.inverse_transform(y_train)})
+test_df = pd.DataFrame({'Category': le.inverse_transform(y_test)})
+
+unique_categories = train_df['Category'].unique()
+colors = sns.color_palette("husl", len(unique_categories))
+
+plt.figure(figsize=(15, 5))
+sns.countplot(data=train_df, x='Category', hue='Category', palette=colors, legend=False, order=unique_categories)
+plt.title('Training Categories Distribution')
+plt.xticks(rotation=90)
+plt.savefig('training_category_count_plot.png', bbox_inches='tight')
+plt.close()
+
+plt.figure(figsize=(15, 5))
+sns.countplot(data=test_df, x='Category', hue='Category', palette=colors, legend=False, order=unique_categories)
+plt.title('Testing Categories Distribution')
+plt.xticks(rotation=90)
+plt.savefig('testing_category_count_plot.png', bbox_inches='tight')
+plt.close()

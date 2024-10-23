@@ -3,10 +3,8 @@ from functions import pdf_to_string
 import pickle
 from functions import cleanResume
 import numpy as np
-from functions import le
 from functions import generate_roadmap
 
-#---------------------------------- Prediction -----------------------------------#
 myresume=""
 
 pdf = select_pdf_file()
@@ -19,7 +17,6 @@ with open('lg_clf.pkl', 'rb') as lr_file:
     lg_clf = pickle.load(lr_file)
 with open('label_encoder.pkl', 'rb') as le_file:
     le_loaded = pickle.load(le_file)
-
 
 cleaned_resume = cleanResume(myresume)
 input_features = tfidf.transform([cleaned_resume])

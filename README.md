@@ -25,3 +25,6 @@ pip install scikit-learn
 ```bash
 pip install pandas
 
+```bash
+pip install seaborn
+
