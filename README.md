@@ -10,9 +10,6 @@ This tool makes use of modern technologies like Artificial Intelligence, Machine
 
 You need to run the `main.py` file. You will be asked to upload a pdf file via a window pop-up. The chatbot will then process the uploaded file and provide you with a personalized career advice. You can then choose any number between 1 and 5 to display the road map. The chatbot will then display the road map based on your choice if the open-ai api key has been given.  
 
-### Note
-
-Github does not allow pushing the api key, therefore, you will have to manually give the open-ai api key in the generate_roadmap function in functions.py to get the roadmap. 
 
 ## Required Packages
 
@@ -34,9 +31,6 @@ Before running `main.py`, ensure you have installed the necessary packages. Use 
   ```bash
   pip install open-ai
 
-- **For Data Cleaning:**
-  ```bash
-  pip install re
 
 ## Additonal Packages
 
