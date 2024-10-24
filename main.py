@@ -13,14 +13,14 @@ if pdf:
 
 with open('tfidf.pkl', 'rb') as tfidf_file:
     tfidf = pickle.load(tfidf_file)
-with open('lg_clf.pkl', 'rb') as lr_file:
-    lg_clf = pickle.load(lr_file)
+with open('ann_clf.pkl', 'rb') as lr_file:
+    ann_clf = pickle.load(lr_file)
 with open('label_encoder.pkl', 'rb') as le_file:
     le_loaded = pickle.load(le_file)
 
 cleaned_resume = cleanResume(myresume)
 input_features = tfidf.transform([cleaned_resume])
-predicted_probabilities = lg_clf.predict_proba(input_features)
+predicted_probabilities = ann_clf.predict_proba(input_features)
 
 top_n = 5  
 top_n_indices = np.argsort(predicted_probabilities[0])[-top_n:][::-1]  
