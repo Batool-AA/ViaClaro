@@ -6,6 +6,14 @@ The intricacies of career planning and job finding are quite daunting, especiall
 
 This tool makes use of modern technologies like Artificial Intelligence, Machine Learning, Natural Language Processing, and Large Language Models to provide personalized career advice based on users’ skills and interests. The chatbot will not only suggest potential career paths and available job opportunities based on the users’ skills but will also suggest an optimized road map to achieve the users’ career goals.
 
+## How to Run
+
+You need to run the `main.py` file. You will be asked to upload a pdf file via a window pop-up. The chatbot will then process the uploaded file and provide you with a personalized career advice. You can then choose any number between 1 and 5 to display the road map. The chatbot will then display the road map based on your choice if the open-ai api key has been given.  
+
+### Note
+
+Github does not allow pushing the api key, therefore, you will have to manually give the open-ai api key in the generate_roadmap function in functions.py to get the roadmap. 
+
 ## Required Packages
 
 Before running `main.py`, ensure you have installed the necessary packages. Use the commands below to install them.
@@ -30,7 +38,9 @@ Before running `main.py`, ensure you have installed the necessary packages. Use 
   ```bash
   pip install re
 
-## Additonal Packages for `model.py`
+## Additonal Packages
+
+Before running `model.py`, ensure you have installed the necessary packages. Use the commands below to install them.
 
 - **Running Built-in Models:**
   ```bash
