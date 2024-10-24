@@ -29,7 +29,7 @@ Before running `main.py`, ensure you have installed the necessary packages. Use 
 
 - **Generating Road Map:**
   ```bash
-  pip install open-ai
+  pip install openai == 0.28
 
 
 ## Additonal Packages
