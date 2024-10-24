@@ -13,8 +13,8 @@ if pdf:
 
 with open('tfidf.pkl', 'rb') as tfidf_file:
     tfidf = pickle.load(tfidf_file)
-with open('ann_clf.pkl', 'rb') as lr_file:
-    ann_clf = pickle.load(lr_file)
+with open('ann_clf.pkl', 'rb') as ann_file:
+    ann_clf = pickle.load(ann_file)
 with open('label_encoder.pkl', 'rb') as le_file:
     le_loaded = pickle.load(le_file)
 
