@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Upload</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    h2 {
+      margin-bottom: 20px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #fff;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    input[type="file"] {
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: #4CAF50;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    .result {
+      margin-top: 20px;
+    }
+
+    .result h3 {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
+
+    .career-paths {
+      display: flex;
+      justify-content: space-between;  /* Evenly space the items */
+      gap: 10px;  /* Space between items */
+      flex-wrap: wrap;  /* Ensure they wrap on smaller screens */
+    }
+
+    .career-paths button {
+      flex: 1 1 18%;  /* Set a base width, and allow wrapping */
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .career-paths button:hover {
+      background-color: #45a049;
+    }
+
+    /* Highlight the active career path */
+    .highlighted {
+      background-color: #ff6347 !important;  /* Tomato color */
+      color: white;
+    }
+
+    .roadmap {
+      margin-top: 20px;
+    }
+
+    .roadmap ul {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .roadmap li {
+      padding: 8px;
+      margin: 5px 0;
+    }
+
+    .loading {
+      font-size: 16px;
+      color: #888;
+      text-align: center;
+      padding: 10px;
+    }
+
+    .action-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    /* Highlight the selected action button */
+    .action-buttons button.selected {
+      background-color: #ff6347 !important;  /* Highlight color */
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h2>Upload Your Resume</h2>
+  </header>
+
+  <div class="container">
+    <form id="resumeForm">
+      <input type="file" id="resumeFile" />
+      <button type="submit">Submit</button>
+    </form>
+
+    <div id="actionSelection" class="result"></div> <!-- Added section for action selection -->
+    <div id="actionButtons" class="action-buttons"></div>
+    <div id="careerPaths" class="result"></div>
+    <div id="roadmap" class="roadmap"></div>
+  </div>
+
+  <script>
+    let resumeData = null; 
+    const form = document.getElementById('resumeForm');
+form.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const file = document.getElementById('resumeFile').files[0];
+  const formData = new FormData();
+  formData.append('file', file);
+
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/upload', {
+      method: 'POST',
+      body: formData,
+    });
+    const data = await response.json();
+    console.log('Upload response:', data);  // Log the response from upload API
+    resumeData = data; 
+    if (data.topCareerPaths) {
+          const actionButtonsDiv = document.getElementById('actionButtons');
+          actionButtonsDiv.innerHTML = `
+            <button onclick="showCareerPaths()">Career Paths</button>
+            <button onclick="jobRecommendation(event)">Job Recommendation</button>
+          `;
+        }
+  } catch (error) {
+    console.error('Error uploading file:', error);
+    alert('Error uploading file');
+  }
+});
+
+function showCareerPaths() {
+    if (!resumeData || !resumeData.topCareerPaths) {
+      alert('No career paths available.');
+      return;
+    }
+
+    const careerPathsDiv = document.getElementById('careerPaths');
+    careerPathsDiv.innerHTML = `<h3>Top 5 Career Paths:</h3><div class="career-paths">${resumeData.topCareerPaths.map((path, index) => `<button class="career-btn" onclick="selectCareer('${path.category}', this)">${path.category}</button>`).join('')}</div>`;
+  }
+
+
+  function selectCareer(careerPath, button) {
+  // Highlight the selected career path
+  const buttons = document.querySelectorAll('.career-btn');
+  buttons.forEach(btn => btn.classList.remove('highlighted'));
+  button.classList.add('highlighted');
+
+  // Call fetchRoadmap to display the roadmap for the selected career
+  fetchRoadmap(careerPath, button);
+}
+
+
+async function fetchRoadmap(careerPath, button) {
+  console.log('Fetching roadmap for:', careerPath);  // Log the selected career path
+  const actionButtons = document.querySelectorAll('.action-buttons button');
+  actionButtons.forEach(btn => btn.classList.remove('selected'));
+  button.classList.add('selected');
+
+  const roadmapDiv = document.getElementById('roadmap');
+  roadmapDiv.innerHTML = '<p class="loading">Loading roadmap...</p>';
+  try {
+    const response = await fetch('http://127.0.0.1:5000/api/roadmap', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ careerPath })
+    });
+    const data = await response.json();
+    console.log('Roadmap response:', data);  // Log the response from the roadmap API
+
+    if (data.roadmap) {
+      const roadmapList = data.roadmap.split('\n').map(item => `<li>${item}</li>`).join('');
+      roadmapDiv.innerHTML = `<h3>Career Roadmap:</h3><ul>${roadmapList}</ul>`;
+    } else {
+      roadmapDiv.innerHTML = '<p>No roadmap available.</p>';
+    }
+  } catch (error) {
+    console.error('Error fetching roadmap:', error);
+    alert('Error fetching roadmap');
+  }
+}
+
+function jobRecommendation(event) {
+  const button = event.target;  // Get the button that was clicked
+  
+  // Highlight the selected action button
+  const actionButtons = document.querySelectorAll('.action-buttons button');
+  actionButtons.forEach(btn => btn.classList.remove('selected'));
+  button.classList.add('selected');
+  
+  // Show loading message
+  const jobRecommendationDiv = document.getElementById('roadmap');  // Use the roadmap div for job recommendations
+  jobRecommendationDiv.innerHTML = '<p class="loading">Loading jobs...</p>';
+  
+  // Placeholder alert for job recommendation functionality
+  alert("Job recommendation functionality is coming soon!");
+}
+
+
+  </script>
+</body>
+</html>

@@ -13,13 +13,36 @@ def select_pdf_file():
     file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
     return file_path
 
-def pdf_to_string(file_path):
-    with open(file_path, "rb") as file:
-        reader = PyPDF2.PdfReader(file)
+import PyPDF2
+import pytesseract
+from pdf2image import convert_from_path
+import io
+
+def pdf_to_string(file):
+    # Ensure that the file is being read correctly in Flask
+    try:
+        # Read the file as a binary stream using file.read()
+        file_stream = io.BytesIO(file.read())
+
+        # Try to extract text from the PDF
+        reader = PyPDF2.PdfReader(file_stream)
         text = ""
         for page in reader.pages:
             text += page.extract_text() + "\n"
-    return text
+
+        # If no text is found (possibly an image-based PDF), use OCR
+        if not text.strip():
+            print("No text found in PDF, trying OCR...")
+            images = convert_from_path(file_stream)
+            text = ""
+            for image in images:
+                text += pytesseract.image_to_string(image) + "\n"
+
+        return text
+    except Exception as e:
+        print(f"Error processing PDF: {e}")
+        return str(e)
+
 
 def cleanResume(txt):
     cleanText = re.sub(r'http\S+\s', ' ', txt)
@@ -52,9 +75,9 @@ def assigning_categories(df,column):
     return le, unique_values
 
 def generate_roadmap(domain):
-    openai.api_key = ''
+    openai.api_key = 'sk-SyD8VVSdgBAhB1wcAjdEKSDW5xf6S9ufTrBiE1sXPmT3BlbkFJA6q6fxFrGZKt7ByzU6SYnaxESShyOhk5B9LWFCZWYA'
     if (openai.api_key != ''):
-        prompt = f"Create a comprehensive roadmap for ${domain}. The roadmap should contain all the key skills to excel in this profession. Also mention the dependencies between these skills."
+        prompt = f"Create a comprehensive roadmap for ${domain}. The roadmap should contain all the key skills to excel in this profession."
         
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo", 
