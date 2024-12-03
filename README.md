@@ -45,5 +45,3 @@ Before running `app.py` and `index.html`, ensure you have installed the necessar
 -**Combined Command**
   ```bash
   pip install PyPDF2 scikit-learn pandas openai==0.28 contractions transformers torch flask flask_cors numpy pickle
-
-
