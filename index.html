@@ -152,47 +152,53 @@
   </div>
 
   <script>
-    let resumeData = null; 
+    const formData = new FormData();
+
     const form = document.getElementById('resumeForm');
-form.addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const file = document.getElementById('resumeFile').files[0];
-  const formData = new FormData();
-  formData.append('file', file);
 
-  try {
-    const response = await fetch('http://127.0.0.1:5000/api/upload', {
-      method: 'POST',
-      body: formData,
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const file = document.getElementById('resumeFile').files[0];
+      
+      formData.append('file', file);
+
+      const actionButtonsDiv = document.getElementById('actionButtons');
+      actionButtonsDiv.innerHTML = `
+        <button onclick="showCareerPaths()">Career Paths</button>
+        <button onclick="jobRecommendation()">Job Recommendation</button>
+      `;
     });
-    const data = await response.json();
-    console.log('Upload response:', data);  // Log the response from upload API
-    resumeData = data; 
-    if (data.topCareerPaths) {
-          const actionButtonsDiv = document.getElementById('actionButtons');
-          actionButtonsDiv.innerHTML = `
-            <button onclick="showCareerPaths()">Career Paths</button>
-            <button onclick="jobRecommendation(event)">Job Recommendation</button>
-          `;
+
+
+async function showCareerPaths() {
+  try {
+        const response = await fetch('http://127.0.0.1:5000/api/career', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        console.log('Upload response:', data);  // Log the response from upload API
+        
+        const jobRecommendationDiv = document.getElementById('roadmap');  // Use the roadmap div for job recommendations
+        jobRecommendationDiv.innerHTML = '';
+        if (data.topCareerPaths) {
+          const careerPathsDiv = document.getElementById('careerPaths');
+          careerPathsDiv.innerHTML = `<h3>Top 5 Career Paths:</h3><div class="career-paths">${data.topCareerPaths.map((path, index) => `<button class="career-btn" onclick="selectCareer('${path.category}', this)">${path.category}</button>`).join('')}</div>`;
         }
-  } catch (error) {
-    console.error('Error uploading file:', error);
-    alert('Error uploading file');
-  }
-});
-
-function showCareerPaths() {
-    if (!resumeData || !resumeData.topCareerPaths) {
-      alert('No career paths available.');
-      return;
-    }
-
-    const careerPathsDiv = document.getElementById('careerPaths');
-    careerPathsDiv.innerHTML = `<h3>Top 5 Career Paths:</h3><div class="career-paths">${resumeData.topCareerPaths.map((path, index) => `<button class="career-btn" onclick="selectCareer('${path.category}', this)">${path.category}</button>`).join('')}</div>`;
+        else
+        {
+          alert('No career paths available.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('Error uploading file');
+      }
   }
 
 
-  function selectCareer(careerPath, button) {
+function selectCareer(careerPath, button) {
   // Highlight the selected career path
   const buttons = document.querySelectorAll('.career-btn');
   buttons.forEach(btn => btn.classList.remove('highlighted'));
@@ -232,20 +238,30 @@ async function fetchRoadmap(careerPath, button) {
   }
 }
 
-function jobRecommendation(event) {
-  const button = event.target;  // Get the button that was clicked
-  
-  // Highlight the selected action button
-  const actionButtons = document.querySelectorAll('.action-buttons button');
-  actionButtons.forEach(btn => btn.classList.remove('selected'));
-  button.classList.add('selected');
-  
-  // Show loading message
-  const jobRecommendationDiv = document.getElementById('roadmap');  // Use the roadmap div for job recommendations
-  jobRecommendationDiv.innerHTML = '<p class="loading">Loading jobs...</p>';
-  
-  // Placeholder alert for job recommendation functionality
-  alert("Job recommendation functionality is coming soon!");
+async function jobRecommendation() {
+  try {
+        const response = await fetch('http://127.0.0.1:5000/api/job', {
+          method: 'POST',
+          body: formData,
+        });
+        const data = await response.json();
+        console.log('Upload response:', data);  // Log the response from upload API
+        
+        const careerPathsDiv = document.getElementById('careerPaths');  // Use the roadmap div for job recommendations
+        careerPathsDiv.innerHTML = '';
+        if (data.topCareerPaths) {
+          const jobRecommendation = document.getElementById('roadmap');
+          jobRecommendation.innerHTML = `<h3>Top 5 Career Paths:</h3><div class="career-paths">${data.topCareerPaths.map((path, index) => `<button class="career-btn" onclick="selectCareer('${path.category}', this)">${path.category}</button>`).join('')}</div>`;
+        }
+        else
+        {
+          alert('No career paths available.');
+          return;
+        }
+      } catch (error) {
+        console.error('Error uploading file:', error);
+        alert('Error uploading file');
+      }
 }
 
 

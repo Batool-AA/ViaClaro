@@ -87,8 +87,7 @@ model = DistilBertModel.from_pretrained('distilbert-base-uncased')
 
 ## Jobs Loading + Embeddings ##
 job_file = 'data/Jobs/job_descriptions.csv'
-job_data = pd.read_csv(job_file)
-job_data= job_data[:2000]
+job_data = pd.read_csv(job_file, nrows=2000)
 with open('job_embeddings.pkl', 'rb') as f:
     job_embeddings_distilbert = pickle.load(f)
 
