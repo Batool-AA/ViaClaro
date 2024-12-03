@@ -8,7 +8,7 @@ import contractions
 import torch
 from transformers import DistilBertTokenizer, DistilBertModel
 from sklearn.metrics.pairwise import cosine_similarity
-from functions import select_pdf_file
+from functions import select_pdf_file, extract_website, extract_details, text_cleaning
 import pickle
 import json
 
@@ -22,64 +22,12 @@ def extract_information(pdf_path):
     return resume_text
 
 
-def extract_details(resume_text):
-    # Define regular expressions to extract Skills & Education
-    skills_pattern = r'Skills\n([\s\S]*?)(?=\n[A-Z]|$)' 
-    education_pattern = r'Education\n([\s\S]*?)(?=\n[A-Z][a-z]*\n|$)'
-    
-    skills_match = re.findall(skills_pattern, resume_text, re.DOTALL)
-    education_match = re.findall(education_pattern, resume_text, re.DOTALL)
-    
-    if len(skills_match)!=0:
-        skills = skills_match[0]
-    else:
-        skills_pattern = r'skills\n((?:.*)*)' 
-        skills_match = re.findall(skills_pattern, resume_text, re.DOTALL)
-        if len(skills_match)!=0:
-            skills = skills_match[0]
-        else:
-            skills = None
-            
-    if len(education_match)!=0:
-        education = education_match[0]
-    else:
-        education = None
-    
-    return {
-        'Skills': skills,
-        'Education': education
-    }
-
-def text_cleaning(text:str) -> str:
-    if pd.isnull(text):
-        return
-    text = text.lower().strip()
-    translator = str.maketrans('', '', string.punctuation)
-    text = contractions.fix(text)
-    text = re.sub(r'http\S+|www\S+|https\S+', '', text) # Remove URLs
-    text = re.sub(r'\S+@\S+', '', text) # Remove emails
-    text = re.sub(r'\b\d{1,3}[-./]?\d{1,3}[-./]?\d{1,4}\b', '', text) # Remove phone numbers
-    text = text.translate(translator) # Remove puctuations
-    text = re.sub(r'[^a-zA-Z]', ' ', text) # Remove other non-alphanumeric characters
-    
-    return text.strip()
-
-def extract_website(json_str):
-    try:
-        data_dict = json.loads(json_str)  # Convert JSON string to dictionary
-        return data_dict.get("Website", None) 
-    except Exception as e:
-        return None 
-
-
 ## Resume  Extraction + Embeddings ##
 pdf = select_pdf_file()
 resume_text = extract_information(pdf)
 skills_education = extract_details(resume_text)
 resume_cleaned = skills_education['Skills'] + ' ' + skills_education['Education']
 resume_cleaned = text_cleaning(resume_cleaned)
-
-
 
 
 tokenizer = DistilBertTokenizer.from_pretrained('distilbert-base-uncased')

@@ -122,7 +122,7 @@
 
     .action-buttons {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       gap: 10px;
       margin-top: 20px;
     }
@@ -131,6 +131,12 @@
     .action-buttons button.selected {
       background-color: #ff6347 !important;  /* Highlight color */
       color: white;
+    }
+
+    a {
+      color: black;
+      cursor: pointer;
+      text-decoration: none;
     }
   </style>
 </head>
@@ -165,7 +171,7 @@
 
       const actionButtonsDiv = document.getElementById('actionButtons');
       actionButtonsDiv.innerHTML = `
-        <button onclick="showCareerPaths()">Career Paths</button>
+        <button onclick="showCareerPaths()">Career Path</button>
         <button onclick="jobRecommendation()">Job Recommendation</button>
       `;
     });
@@ -247,15 +253,17 @@ async function jobRecommendation() {
         const data = await response.json();
         console.log('Upload response:', data);  // Log the response from upload API
         
-        const careerPathsDiv = document.getElementById('careerPaths');  // Use the roadmap div for job recommendations
+        const careerPathsDiv = document.getElementById('careerPaths');  
         careerPathsDiv.innerHTML = '';
-        if (data.topCareerPaths) {
-          const jobRecommendation = document.getElementById('roadmap');
-          jobRecommendation.innerHTML = `<h3>Top 5 Career Paths:</h3><div class="career-paths">${data.topCareerPaths.map((path, index) => `<button class="career-btn" onclick="selectCareer('${path.category}', this)">${path.category}</button>`).join('')}</div>`;
+        const jobRecommendation = document.getElementById('roadmap'); // Use the roadmap div for job recommendations
+        jobRecommendation.innerHTML = '<p class="loading">Loading job recommendations...</p>';
+        const job = data.topJobs;
+        if (job) {
+          jobRecommendation.innerHTML = `<h3>Top 5 Job Recommendations:</h3><div><ol>${job.map(job => `<li><a href="${job.website}" target="_blank">${job.job_title} at ${job.company_name}</a></li>`).join('')}</ol></div>`;
         }
         else
         {
-          alert('No career paths available.');
+          alert('No jobs available.');
           return;
         }
       } catch (error) {

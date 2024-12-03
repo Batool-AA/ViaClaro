@@ -6,6 +6,10 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import TfidfVectorizer
 import pandas as pd
 import openai
+import string 
+import contractions 
+import json
+import io
 
 def select_pdf_file():
     root = tk.Tk()
@@ -13,10 +17,7 @@ def select_pdf_file():
     file_path = filedialog.askopenfilename(filetypes=[("PDF files", "*.pdf")])
     return file_path
 
-import PyPDF2
-import pytesseract
-from pdf2image import convert_from_path
-import io
+
 
 def pdf_to_string(file):
     # Ensure that the file is being read correctly in Flask
@@ -29,15 +30,6 @@ def pdf_to_string(file):
         text = ""
         for page in reader.pages:
             text += page.extract_text() + "\n"
-
-        # If no text is found (possibly an image-based PDF), use OCR
-        if not text.strip():
-            print("No text found in PDF, trying OCR...")
-            images = convert_from_path(file_stream)
-            text = ""
-            for image in images:
-                text += pytesseract.image_to_string(image) + "\n"
-
         return text
     except Exception as e:
         print(f"Error processing PDF: {e}")
@@ -77,7 +69,7 @@ def assigning_categories(df,column):
 def generate_roadmap(domain):
     openai.api_key = 'sk-SyD8VVSdgBAhB1wcAjdEKSDW5xf6S9ufTrBiE1sXPmT3BlbkFJA6q6fxFrGZKt7ByzU6SYnaxESShyOhk5B9LWFCZWYA'
     if (openai.api_key != ''):
-        prompt = f"Create a comprehensive roadmap for ${domain}. The roadmap should contain all the key skills to excel in this profession."
+        prompt = f"Give a brief description of what {domain} is and create a comprehensive roadmap for {domain}. The roadmap should contain all the key skills to excel in this profession."
         
         response = openai.ChatCompletion.create(
             model="gpt-3.5-turbo", 
@@ -90,3 +82,52 @@ def generate_roadmap(domain):
         return roadmap
     else:
         return "No API Key."
+    
+def extract_details(resume_text):
+    # Define regular expressions to extract Skills & Education
+    skills_pattern = r'Skills\n([\s\S]*?)(?=\n[A-Z]|$)' 
+    education_pattern = r'Education\n([\s\S]*?)(?=\n[A-Z][a-z]*\n|$)'
+    
+    skills_match = re.findall(skills_pattern, resume_text, re.DOTALL)
+    education_match = re.findall(education_pattern, resume_text, re.DOTALL)
+    
+    if len(skills_match)!=0:
+        skills = skills_match[0]
+    else:
+        skills_pattern = r'skills\n((?:.*)*)' 
+        skills_match = re.findall(skills_pattern, resume_text, re.DOTALL)
+        if len(skills_match)!=0:
+            skills = skills_match[0]
+        else:
+            skills = None
+            
+    if len(education_match)!=0:
+        education = education_match[0]
+    else:
+        education = None
+    
+    return {
+        'Skills': skills,
+        'Education': education
+    }
+
+def text_cleaning(text:str) -> str:
+    if pd.isnull(text):
+        return
+    text = text.lower().strip()
+    translator = str.maketrans('', '', string.punctuation)
+    text = contractions.fix(text)
+    text = re.sub(r'http\S+|www\S+|https\S+', '', text) # Remove URLs
+    text = re.sub(r'\S+@\S+', '', text) # Remove emails
+    text = re.sub(r'\b\d{1,3}[-./]?\d{1,3}[-./]?\d{1,4}\b', '', text) # Remove phone numbers
+    text = text.translate(translator) # Remove puctuations
+    text = re.sub(r'[^a-zA-Z]', ' ', text) # Remove other non-alphanumeric characters
+    
+    return text.strip()
+
+def extract_website(json_str):
+    try:
+        data_dict = json.loads(json_str)  # Convert JSON string to dictionary
+        return data_dict.get("Website", None) 
+    except Exception as e:
+        return None 
