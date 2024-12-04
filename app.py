@@ -6,7 +6,7 @@ from functions import pdf_to_string, cleanResume, generate_roadmap
 from transformers import DistilBertTokenizer, DistilBertModel
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
-from functions import extract_details, text_cleaning, extract_website
+from functions import extract_details, text_cleaning, extract_website, extract_information
 import torch
 
 app = Flask(__name__)
@@ -50,7 +50,7 @@ def upload_resume():
             return jsonify({'error': 'Invalid file format, only PDF files are allowed'}), 400
         
         # Process the resume
-        myresume = pdf_to_string(file)
+        myresume = extract_information(file)
         cleaned_resume = cleanResume(myresume)
         input_features = tfidf.transform([cleaned_resume])
         predicted_probabilities = ann_clf.predict_proba(input_features)
@@ -104,7 +104,7 @@ def get_job():
             return jsonify({'error': 'Invalid file format, only PDF files are allowed'}), 400
         
         # Process the resume
-        resume_text = pdf_to_string(file)
+        resume_text = extract_information(file)
         skills_education = extract_details(resume_text)
         resume_cleaned = skills_education['Skills'] + ' ' + skills_education['Education']
         resume_cleaned = text_cleaning(resume_cleaned)

@@ -8,18 +8,12 @@ import contractions
 import torch
 from transformers import DistilBertTokenizer, DistilBertModel
 from sklearn.metrics.pairwise import cosine_similarity
-from functions import select_pdf_file, extract_website, extract_details, text_cleaning
+from functions import select_pdf_file, extract_website, extract_details, text_cleaning, extract_information
 import pickle
 import json
 
 # Define a function to extract information from a PDF
-def extract_information(pdf_path):
-    with pdfplumber.open(pdf_path) as pdf:
-        resume_text = ""
-        for page in pdf.pages:
-            resume_text = " ".join([resume_text, page.extract_text()])
-    resume_text = resume_text.strip()
-    return resume_text
+
 
 
 ## Resume  Extraction + Embeddings ##

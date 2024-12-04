@@ -10,6 +10,15 @@ import string
 import contractions 
 import json
 import io
+import pdfplumber
+
+def extract_information(pdf_path):
+    with pdfplumber.open(pdf_path) as pdf:
+        resume_text = ""
+        for page in pdf.pages:
+            resume_text = " ".join([resume_text, page.extract_text()])
+    resume_text = resume_text.strip()
+    return resume_text
 
 def select_pdf_file():
     root = tk.Tk()
@@ -29,7 +38,8 @@ def pdf_to_string(file):
         reader = PyPDF2.PdfReader(file_stream)
         text = ""
         for page in reader.pages:
-            text += page.extract_text() + "\n"
+            text = " ".join([text, page.extract_text()])
+        text = text.strip()
         return text
     except Exception as e:
         print(f"Error processing PDF: {e}")
@@ -84,13 +94,14 @@ def generate_roadmap(domain):
         return "No API Key."
     
 def extract_details(resume_text):
+    # print("in extract:", resume_text)
     # Define regular expressions to extract Skills & Education
     skills_pattern = r'Skills\n([\s\S]*?)(?=\n[A-Z]|$)' 
     education_pattern = r'Education\n([\s\S]*?)(?=\n[A-Z][a-z]*\n|$)'
     
     skills_match = re.findall(skills_pattern, resume_text, re.DOTALL)
     education_match = re.findall(education_pattern, resume_text, re.DOTALL)
-    
+    # print("s:", skills_match, '\n', "e:", education_match, '\n')
     if len(skills_match)!=0:
         skills = skills_match[0]
     else:
