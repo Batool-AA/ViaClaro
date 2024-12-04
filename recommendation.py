@@ -1,20 +1,9 @@
-import os
-import re
-import pdfplumber
 import pandas as pd
-import numpy as np
-import string 
-import contractions 
 import torch
 from transformers import DistilBertTokenizer, DistilBertModel
 from sklearn.metrics.pairwise import cosine_similarity
 from functions import select_pdf_file, extract_website, extract_details, text_cleaning, extract_information
 import pickle
-import json
-
-# Define a function to extract information from a PDF
-
-
 
 ## Resume  Extraction + Embeddings ##
 pdf = select_pdf_file()
