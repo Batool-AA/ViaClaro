@@ -6,12 +6,12 @@ The intricacies of career planning and job finding are quite daunting, especiall
 
 ## How to Run
 
-You will first need to run `app.py` to start the Flask server. Then, you can access the application by running `index.html`. You will first have to upload your resume and click submit. Two buttons will show up. Clicking the button labelled  `Career Paths` will list the top 5 career paths that you are best suited for. Each career path is a clickable button which gives a short brief on what the profession is and how one might approach it. Clicking the button labelled `Job Recommendations` will list the top 5 job recommendations based on your skills and interests. Make sure to reload the webpage before uploading a different resume.
+You will first need to run `app.py` to start the Flask server. Once the server is set up, it will directly lead you to an interface where you will first have to upload your resume and click submit. Two buttons will show up. Clicking the button labelled  `Career Paths` will list the top 5 career paths that you are best suited for. Each career path is a clickable button which gives a short brief on what the profession is and how one might approach it. Clicking the button labelled `Job Recommendations` will list the top 5 job recommendations based on your skills and interests. Make sure to reload the webpage before uploading a different resume.
 
 
 ## Required Packages
 
-Before running `app.py` and `index.html`, ensure you have installed the necessary packages. Use the commands below to install them.
+Before running `app.py`, ensure you have installed the necessary packages. Use the commands below to install them.
 
 - **PDF Input and Processing:**
   ```bash

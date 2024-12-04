@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 import pickle
 import numpy as np
@@ -8,6 +8,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 from functions import extract_details, text_cleaning, extract_website, extract_information
 import torch
+import webbrowser
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 50 * 1024 * 1024  # 50MB limit
@@ -32,6 +33,10 @@ try:
 except Exception as e:
     print(f"Error loading models: {e}")
     exit(1)
+
+@app.route('/')
+def home():
+    return render_template('index.html')
 
 # Route to handle the resume upload and return career paths
 @app.route('/api/career', methods=['POST'])
@@ -106,7 +111,9 @@ def get_job():
         # Process the resume
         resume_text = extract_information(file)
         skills_education = extract_details(resume_text)
-        resume_cleaned = skills_education['Skills'] + ' ' + skills_education['Education']
+        skills = skills_education.get('Skills', ' ')  # Default to an empty string if 'Skills' is missing
+        education = skills_education.get('Education', ' ')  # Default to an empty string if 'Education' is missing
+        resume_cleaned = skills + ' ' + education
         resume_cleaned = text_cleaning(resume_cleaned)
 
         # Tokenize and embed resume
@@ -152,4 +159,5 @@ def get_job():
         return jsonify({'error': str(e)}), 500
     
 if __name__ == '__main__':
+    webbrowser.open('http://127.0.0.1:5000/')
     app.run(debug=True)

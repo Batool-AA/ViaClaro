@@ -1,5 +1,5 @@
 from functions import select_pdf_file
-from functions import pdf_to_string
+from functions import pdf_to_string, extract_information
 import pickle
 from functions import cleanResume
 import numpy as np
@@ -9,7 +9,7 @@ myresume=""
 
 pdf = select_pdf_file()
 if pdf:
-    myresume = pdf_to_string(pdf)
+    myresume = extract_information(pdf)
 
 with open('tfidf.pkl', 'rb') as tfidf_file:
     tfidf = pickle.load(tfidf_file)
