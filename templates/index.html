@@ -181,7 +181,7 @@
       careerButton.classList.add('selected');
 
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/career', {
+        const response = await fetch('/api/career', {
           method: 'POST',
           body: formData,
         });
@@ -223,7 +223,7 @@
       const roadmapDiv = document.getElementById('roadmap');
       roadmapDiv.innerHTML = '<p class="loading">Loading roadmap...</p>';
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/roadmap', {
+        const response = await fetch('/api/roadmap', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ careerPath })
@@ -255,7 +255,7 @@
       jobRecommendation.innerHTML = '<p class="loading">Loading job recommendations...</p>';
 
       try {
-        const response = await fetch('http://127.0.0.1:5000/api/job', {
+        const response = await fetch('/api/job', {
           method: 'POST',
           body: formData,
         });
